@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Gestão Financeira</title>
+    <style>
+        /* Global styles for the body */
+        body {
+            font-family: 'Inter', sans-serif; /* Using Inter font as instructed */
+            background-color: #f0f2f5; /* Soft background color */
+            color: #333; /* Main text color */
+            display: flex;
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Center content vertically */
+            min-height: 100vh; /* Occupy full viewport height */
+            padding: 20px; /* Inner spacing */
+            box-sizing: border-box; /* Include padding in total width/height */
+        }
+
+        /* Styles for the main application container */
+        .container {
+            background-color: #ffffff; /* White background for the container */
+            padding: 30px; /* Inner spacing */
+            border-radius: 12px; /* Rounded corners */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+            width: 100%; /* Occupy 100% of available width */
+            max-width: 650px; /* Max width for desktops */
+            box-sizing: border-box; /* Ensure padding doesn't increase width */
+            border: 1px solid #e0e0e0; /* Subtle border */
+        }
+
+        /* Titles */
+        h1, h2 {
+            text-align: center; /* Center titles */
+            color: #2c3e50; /* Dark color for titles */
+            margin-bottom: 25px; /* Bottom margin */
+            font-weight: 700; /* Bold font */
+        }
+
+        h1 {
+            font-size: 2.2em; /* Larger size for main title */
+        }
+
+        h2 {
+            font-size: 1.6em; /* Size for subtitles */
+        }
+
+        /* Labels for form fields */
+        label {
+            display: block; /* Each label on a new line */
+            margin-bottom: 8px; /* Bottom spacing */
+            font-weight: 600; /* Semi-bold */
+            color: #34495e; /* Color for labels */
+            font-size: 0.95em;
+        }
+
+        /* Styles for number input fields and select */
+        input[type="number"], select {
+            width: calc(100% - 22px); /* 100% width minus padding and border */
+            padding: 12px; /* Inner spacing */
+            margin-bottom: 18px; /* Bottom margin */
+            border: 1px solid #dcdcdc; /* Soft border */
+            border-radius: 8px; /* Rounded corners */
+            box-sizing: border-box; /* Include padding in width */
+            font-size: 1em; /* Font size */
+            transition: border-color 0.3s ease; /* Smooth border transition */
+        }
+
+        input[type="number"]:focus, select:focus {
+            border-color: #3498db; /* Blue border on focus */
+            outline: none; /* Remove default outline */
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2); /* Shadow on focus */
+        }
+
+        /* Styles for buttons */
+        button {
+            background-color: #3498db; /* Blue background color */
+            color: white; /* White text color */
+            padding: 14px 25px; /* Inner spacing */
+            border: none; /* No border */
+            border-radius: 8px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor on hover */
+            font-size: 1.1em; /* Font size */
+            width: 100%; /* Occupy full width */
+            margin-top: 15px; /* Top margin */
+            transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Button shadow */
+        }
+
+        button:hover {
+            background-color: #2980b9; /* Darker blue on hover */
+            transform: translateY(-2px); /* Lift effect */
+        }
+
+        button:active {
+            transform: translateY(0); /* Return to original position on click */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Smaller shadow on click */
+        }
+
+        /* Info box styles (Current Bankroll, Gains, Losses, Next Bet) */
+        .info-box {
+            background-color: #ecf0f1; /* Light gray background */
+            padding: 20px; /* Inner spacing */
+            border-radius: 10px; /* Rounded corners */
+            margin-top: 25px; /* Top margin */
+            border-left: 6px solid #3498db; /* Blue left border */
+            display: flex; /* Use flexbox for content organization */
+            flex-wrap: wrap; /* Allow items to wrap to the next line on small screens */
+            justify-content: space-around; /* Distribute space around items */
+            align-items: center; /* Align items vertically centered */
+            gap: 15px; /* Space between flex items */
+        }
+
+        .info-box p {
+            margin: 0; /* Remove default paragraph margins */
+            font-size: 1.1em; /* Font size */
+            flex-basis: 45%; /* Each item takes almost half the container width */
+            text-align: center; /* Center text */
+        }
+
+        .info-box strong {
+            color: #2980b9; /* Darker color for important values */
+            font-size: 1.2em; /* Increase value font size */
+        }
+
+        /* Advice messages (success, danger, warning) */
+        .message {
+            margin-top: 25px; /* Top margin */
+            padding: 18px; /* Inner spacing */
+            border-radius: 10px; /* Rounded corners */
+            text-align: center; /* Center text */
+            font-weight: 600; /* Semi-bold */
+            font-size: 1.05em; /* Font size */
+            line-height: 1.4; /* Line height */
+        }
+
+        .message.success {
+            background-color: #d4edda; /* Light green */
+            color: #155724; /* Dark green */
+            border: 1px solid #c3e6cb; /* Green border */
+        }
+
+        .message.danger {
+            background-color: #f8d7da; /* Light red */
+            color: #721c24; /* Dark red */
+            border: 1px solid #f5c6cb; /* Red border */
+        }
+
+        .message.warning {
+            background-color: #fff3cd; /* Light yellow */
+            color: #856404; /* Dark yellow */
+            border: 1px solid #ffeeba; /* Yellow border */
+        }
+
+        /* Divider line */
+        hr {
+            border: none; /* Remove default border */
+            border-top: 1px solid #e0e0e0; /* Thin top border */
+            margin: 35px 0; /* Top and bottom margin */
+        }
+
+        /* Transaction history */
+        #historico {
+            margin-top: 30px; /* Top margin */
+            max-height: 300px; /* Limit height for scrolling */
+            overflow-y: auto; /* Add vertical scrollbar */
+            border: 1px solid #e0e0e0; /* Border around history */
+            border-radius: 10px; /* Rounded corners */
+            padding: 10px; /* Inner spacing */
+            background-color: #fdfdfd; /* Almost white background */
+        }
+
+        #historico ul {
+            list-style: none; /* Remove list markers */
+            padding: 0; /* Remove default padding */
+            margin: 0; /* Remove default margin */
+        }
+
+        #historico li {
+            background-color: #f8f8f8; /* Light background for each item */
+            border-bottom: 1px solid #ebebeb; /* Divider line between items */
+            padding: 12px; /* Inner spacing */
+            display: flex; /* Use flexbox to align content */
+            justify-content: space-between; /* Space between description and bankroll */
+            align-items: center; /* Align items vertically */
+            font-size: 0.9em; /* Font size */
+            border-radius: 6px; /* Rounded corners for each item */
+            margin-bottom: 5px; /* Space between items */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle shadow for each item */
+        }
+
+        #historico li:last-child {
+            border-bottom: none; /* Remove border from the last item */
+            margin-bottom: 0;
+        }
+
+        /* Colors for gain and loss transactions */
+        .transacao-ganho {
+            color: #27ae60; /* Vibrant green */
+            font-weight: 600;
+        }
+
+        .transacao-perda {
+            color: #e74c3c; /* Vibrant red */
+            font-weight: 600;
+        }
+
+        /* Style for small tag (for hints) */
+        small {
+            display: block; /* Occupy a new line */
+            margin-top: -10px; /* Move up to be closer to the input */
+            margin-bottom: 15px; /* Bottom margin */
+            color: #7f8c8d; /* Gray color */
+            font-size: 0.85em; /* Smaller font size */
+            text-align: left; /* Align text to the left */
+        }
+
+        /* Styles for initial setup screen */
+        .setup-screen {
+            text-align: center;
+        }
+
+        /* Media Queries for responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px; /* Reduce padding on smaller screens */
+            }
+            h1 {
+                font-size: 1.8em; /* Adjust title size */
+            }
+            h2 {
+                font-size: 1.4em; /* Adjust subtitle size */
+            }
+            .info-box p {
+                flex-basis: 100%; /* Each item takes full width on smaller screens */
+                text-align: left; /* Align text to the left */
+            }
+            .info-box {
+                flex-direction: column; /* Stack items in a column */
+                align-items: flex-start; /* Align items to the left */
+                gap: 10px; /* Reduce spacing */
+            }
+            .info-box strong {
+                display: inline-block; /* Allow strong to be on the same line */
+                margin-left: 5px; /* Add small spacing */
+            }
+            input[type="number"], select, button {
+                padding: 10px; /* Reduce padding for inputs and buttons */
+                font-size: 0.95em; /* Adjust font size */
+            }
+            #historico li {
+                flex-direction: column; /* Stack in column for small screens */
+                align-items: flex-start; /* Align content to the left */
+                gap: 5px; /* Space between elements */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Initial setup screen -->
+        <div id="setupScreen" class="setup-screen">
+            <h1>Bem-vindo ao Simulador Financeiro</h1>
+            <p>Este aplicativo irá te ajudar a simular estratégias de gestão de capital, analisando ganhos e perdas hipotéticas.</p>
+            <p>Para começar, informe o valor inicial da sua banca (capital):</p>
+            <label for="initialBancaInput">Banca Inicial (R$):</label>
+            <input type="number" id="initialBancaInput" min="1" step="0.01" value="1000.00">
+            <button onclick="setInitialBanca()">Iniciar Simulação</button>
+            <div class="message" id="setupMessage" style="display:none;"></div>
+        </div>
+
+        <!-- Main application screen (initially hidden) -->
+        <div id="appScreen" style="display:none;">
+            <h1>Simulador de Gestão Financeira</h1>
+            <div class="info-box">
+                <p>Banca Atual: R$ <strong id="bancaAtual">0.00</strong></p>
+                <p>Transações de Ganho: <strong id="totalGanhos">0</strong></p>
+                <p>Transações de Perda: <strong id="totalPerdas">0</strong></p>
+                <p>Recomendação de Próxima Transação: R$ <strong id="proximaAposta">0.00</strong></p>
+            </div>
+
+            <hr>
+
+            <h2>Registrar Transação</h2>
+            <div>
+                <label for="valorTransacao">Valor da Transação:</label>
+                <input type="number" id="valorTransacao" min="0.01" step="0.01" value="10.00">
+            </div>
+            <div>
+                <label for="tipoResultado">Resultado:</label>
+                <select id="tipoResultado">
+                    <option value="ganho">Ganho</option>
+                    <option value="perda">Perda</option>
+                </select>
+            </div>
+            <div>
+                <label for="valorResultado">Valor Ganho/Perdido:</label>
+                <input type="number" id="valorResultado" min="0.01" step="0.01" value="10.00">
+                <small> (Informe o valor efetivo ganho ou perdido. Ex: se transacionou 10 e ganhou 20, informe 20. Se transacionou 10 e perdeu, informe 10)</small>
+            </div>
+            <button onclick="registrarTransacao()">Registrar Transação</button>
+
+            <div class="message" id="mensagemAconselhamento"></div>
+
+            <hr>
+
+            <h2>Histórico de Transações</h2>
+            <div id="historico">
+                <ul id="listaHistorico">
+                    <!-- History items will be added here via JS -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables to store application state
+        let banca = 0; // The current bankroll value
+        let totalGanhosCount = 0; // Counter for gain transactions
+        let totalPerdasCount = 0; // Counter for loss transactions
+        let ultimaApostaRecomendada = 0.00; // Recommended value for the next transaction
+
+        // References to HTML elements for updating the interface
+        const setupScreen = document.getElementById('setupScreen');
+        const appScreen = document.getElementById('appScreen');
+        const initialBancaInput = document.getElementById('initialBancaInput');
+        const setupMessage = document.getElementById('setupMessage');
+
+        const bancaAtualElement = document.getElementById('bancaAtual');
+        const totalGanhosElement = document.getElementById('totalGanhos');
+        const totalPerdasElement = document.getElementById('totalPerdas');
+        const proximaApostaElement = document.getElementById('proximaAposta');
+        const mensagemAconselhamentoElement = document.getElementById('mensagemAconselhamento');
+        const listaHistoricoElement = document.getElementById('listaHistorico');
+
+        /**
+         * Updates the values displayed in the interface (bankroll, counters, next suggested transaction).
+         */
+        function atualizarDisplay() {
+            bancaAtualElement.textContent = banca.toFixed(2); // Format to 2 decimal places
+            totalGanhosElement.textContent = totalGanhosCount;
+            totalPerdasElement.textContent = totalPerdasCount;
+            proximaApostaElement.textContent = ultimaApostaRecomendada.toFixed(2); // Format to 2 decimal places
+        }
+
+        /**
+         * Provides advice for the next transaction based on the current bankroll and history.
+         * This is the "prediction" (advisory) logic of the application, simulating strategic suggestions.
+         */
+        function aconselharProximaTransacao() {
+            let mensagem = ""; // Advisory message
+            let tipoMensagem = ""; // Message type (success, danger, warning) for CSS styles
+
+            // Advisory logic:
+            // 1. If the bankroll is zero or negative
+            if (banca <= 0) {
+                mensagem = "Sua banca zerou ou está negativa! Não é recomendado realizar mais transações. Considere iniciar com um novo capital.";
+                tipoMensagem = "danger";
+                ultimaApostaRecomendada = 0; // No value to transact
+            }
+            // 2. Recovery Mode: If the number of losses is significantly higher than gains.
+            //    Here, we consider a difference of 3 or more net losses.
+            else if ((totalPerdasCount - totalGanhosCount) >= 3) {
+                mensagem = "Modo Recuperação: Você teve uma sequência de perdas. É recomendado diminuir o valor da próxima transação (Mínimo: R$ 1.00) para proteger sua banca e buscar a recuperação de forma cautelosa.";
+                tipoMensagem = "danger";
+                // Suggests 5% of the current bankroll, with a minimum of R$ 1.00
+                ultimaApostaRecomendada = Math.max(1.00, (banca * 0.05));
+            }
+            // 3. Reward Mode: If the number of gains is higher than losses and the bankroll is comfortable.
+            //    "Comfortable" is considered if the bankroll is greater than R$ 50.00.
+            else if (totalGanhosCount > totalPerdasCount && banca > 50) {
+                mensagem = "Modo Recompensa: Sua banca está crescendo! Você pode considerar um valor de transação um pouco maior, mas sempre com moderação e responsabilidade para consolidar seus ganhos.";
+                tipoMensagem = "success";
+                // Suggests 10% of the current bankroll, with a minimum of R$ 5.00
+                ultimaApostaRecomendada = Math.max(5.00, (banca * 0.10));
+            }
+            // 4. Caution / Normal Mode: For other situations, maintains a more neutral stance.
+            else {
+                mensagem = "Mantenha a cautela. É recomendado continuar com o valor de transação atual ou adaptá-lo conforme sua estratégia de gestão de risco e o comportamento da banca.";
+                tipoMensagem = "warning";
+                // Suggests 8% of the current bankroll, with a minimum of R$ 1.00
+                ultimaApostaRecomendada = Math.max(1.00, (banca * 0.08));
+            }
+
+            // Set the text and CSS class for the advisory message
+            mensagemAconselhamentoElement.textContent = mensagem;
+            mensagemAconselhamentoElement.className = `message ${tipoMensagem}`; // Apply the class for styling
+        }
+
+        /**
+         * Registers a new transaction (gain or loss), updates the bankroll and history.
+         */
+        function registrarTransacao() {
+            // Get values from input fields
+            const valorTransacao = parseFloat(document.getElementById('valorTransacao').value);
+            const tipoResultado = document.getElementById('tipoResultado').value;
+            const valorResultado = parseFloat(document.getElementById('valorResultado').value);
+
+            // Basic input validation
+            if (isNaN(valorTransacao) || valorTransacao <= 0 || isNaN(valorResultado) || valorResultado <= 0) {
+                // Instead of alert(), use a temporary on-screen message
+                mensagemAconselhamentoElement.textContent = "Por favor, insira valores válidos e positivos para a transação e o resultado.";
+                mensagemAconselhamentoElement.className = "message danger";
+                return; // Exit the function if values are invalid
+            }
+
+            // Create a new list item for the history
+            const itemHistorico = document.createElement('li');
+            let descricaoTransacao = ""; // Description of the transaction for history
+
+            // Logic to process gain or loss
+            if (tipoResultado === 'ganho') {
+                banca += valorResultado; // Add the gained value to the bankroll
+                totalGanhosCount++; // Increment gain counter
+                descricaoTransacao = `Transação de R$ ${valorTransacao.toFixed(2)} - Ganho de R$ ${valorResultado.toFixed(2)}`;
+                itemHistorico.classList.add('transacao-ganho'); // Add class for green styling
+            } else { // tipoResultado === 'perda'
+                banca -= valorResultado; // Subtract the lost value from the bankroll
+                totalPerdasCount++; // Increment loss counter
+                descricaoTransacao = `Transação de R$ ${valorTransacao.toFixed(2)} - Perda de R$ ${valorResultado.toFixed(2)}`;
+                itemHistorico.classList.add('transacao-perda'); // Add class for red styling
+            }
+
+            // Set the content of the history item
+            itemHistorico.innerHTML = `
+                <span>${new Date().toLocaleString()} - ${descricaoTransacao}</span>
+                <span>Banca: R$ ${banca.toFixed(2)}</span>
+            `;
+            listaHistoricoElement.prepend(itemHistorico); // Add item to the beginning of the history list (most recent appear first)
+
+            // After registering the transaction, update advice and display
+            aconselharProximaTransacao(); // Recalculate the suggestion for the next transaction
+            atualizarDisplay(); // Update all values in the interface
+
+            // Set input fields for the next transaction with the suggested value
+            document.getElementById('valorTransacao').value = ultimaApostaRecomendada.toFixed(2);
+            document.getElementById('valorResultado').value = ultimaApostaRecomendada.toFixed(2);
+        }
+
+        /**
+         * Sets the initial bankroll provided by the user and displays the main app screen.
+         */
+        function setInitialBanca() {
+            const initialValue = parseFloat(initialBancaInput.value);
+
+            if (isNaN(initialValue) || initialValue <= 0) {
+                setupMessage.textContent = "Por favor, insira um valor inicial válido e positivo para a banca.";
+                setupMessage.className = "message danger";
+                setupMessage.style.display = 'block';
+                return;
+            }
+
+            banca = initialValue; // Set the initial bankroll
+            setupScreen.style.display = 'none'; // Hide the setup screen
+            appScreen.style.display = 'block'; // Show the main app screen
+
+            atualizarDisplay(); // Update initial display
+            aconselharProximaTransacao(); // Provide initial advice
+            document.getElementById('valorTransacao').value = ultimaApostaRecomendada.toFixed(2);
+            document.getElementById('valorResultado').value = ultimaApostaRecomendada.toFixed(2);
+        }
+
+        /**
+         * Initialization function for the application, called when the page loads.
+         * Only displays the initial setup screen.
+         */
+        window.onload = function() {
+            setupScreen.style.display = 'block'; // Ensure setup screen is visible on load
+            appScreen.style.display = 'none'; // Ensure app screen is hidden on load
+            setupMessage.style.display = 'none'; // Hide setup message initially
+        };
+    </script>
+</body>
+</html>
